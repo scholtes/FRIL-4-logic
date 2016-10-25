@@ -1,0 +1,75 @@
+
+
+/* (kb NAME LIST) describes the knowledge base named NAME */
+
+((kb 1 (p (p imp q) (q imp r) (r and t)(r imp s)) ))
+((kb 2 (p (p imp q) (q imp r) (r and t and u)(r imp s)) ))
+((kb 3 ( (p and q and r and t) (t imp s)) ))
+
+/* (roi NAME KB RES) describes the effect RES of the rule of 
+inference NAME on the knowledge base KB 
+*/
+((roi ModusPonens  KB  (Q|KB2))
+	%(kb KBNAME KB) 
+	(mem P KB KB1)
+	(mem (P imp Q) KB1 KB2))
+
+
+
+/* (mem E L1 L2) is a member like predicate which succeeds when L2 is L with E removed; if E is not in L it returns L
+*/
+
+((mem H (H|T) T))
+((mem E (H|T) (H|T1))(mem E T T1))
+%((mem _ L L))   % one may decide not to use this, but in that case 
+		% mem fails when E is not in L
+
+
+/* more general AndElimination */
+
+((roi AndElimination  KB  RES)
+	(mem L KB KB1)
+	(andlist L)
+	(delete_all and L L1)
+	(append L1 KB1 RES))
+
+((andlist (X and Y))(!))
+((andlist ( X and | T))(andlist T))
+
+((delete_all _ () ()))
+((delete_all H (H|T) T1)(delete_all H T T1))
+((delete_all X (H|T) (H|T1))(delete_all X T T1))
+
+((append () L L))
+((append (H1|T1) L2 (H1|T))
+	(append T1 L2 T))
+
+
+
+((test1)
+	(kb 2 L)(roi  AndElimination L L1)(pp L L1)
+	(roi  AndElimination L1 L2)(pp L2)
+	(roi ModusPonens L2 RES)(pp RES))
+
+((test2)
+	(kb 2 L)(roi  AndElimination L L1)(pp L L1)
+	(roi  AndElimination L1 L2)(pp L2)
+	(roi ModusPonens L2 RES)(pp RES)
+	(roi ModusPonens RES RES2)(pp RES2))
+
+((test3)
+	(kb 2 L)(roi  AndElimination L L1)(pp L L1)
+	(roi  AndElimination L1 L2)(pp L2)
+	(roi ModusPonens L2 RES)(pp RES)
+	(roi ModusPonens RES RES2)(pp RES2)
+	(roi ModusPonens RES2 RES3)(pp RES3))
+
+
+
+((twosteps L L2)(roi R1 L L1)(roi R2 L1 L2))
+
+((small_tp _ P C S)(twosteps P L2)(member C L2))
+
+
+((member H (H|_)))
+((member X (H|T))(member X T))
