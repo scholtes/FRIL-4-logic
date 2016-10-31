@@ -1,0 +1,76 @@
+reload tp
+reload test
+/*
+Theorem prove predicate
+
+The first argument is a list that contains the premises. Each premises is a list.
+The format is the following:
+((P1) and (P2) and (P3))
+the P1,P2... are the premises and can be any expression that contains the operators
+and, or, not , imp. imp stands for implication.
+
+if the premise is only an not should be like ((not a)).
+For the rest is should be used only one parentheses. 
+Ex. (a), (a and b), (a or b) , (a imp b)
+When an expression is negated the syntax is : (not (<expression>))
+Ex. (not (a imp b))
+
+The predicate will print all the intermediary steps until will reach the conclusion
+
+*/
+
+
+((tp PRE CON STEPS)
+	(eq (not CON) T)			/* Negation of conclusion added */
+	(append (T and ) PRE KB1)	/* Append the negated conclusion to the premises */
+	(pp KB1)
+	(check KB1)				/* Checkin for the proper syntax */
+	(pp "Check is Successful")
+	(remove_imp KB1 KB2)		/* Remove any implication */
+	(pp "Ïmplications Removed")
+	(put_not KB2 KB3)	/* Apply any not and put them in the proper form.*/
+	(pp KB3)
+	(pp "Nots propagated")
+	(conv KB3 KB4)			/* Convert the knowledgebase in a list form*/
+	(pp KB4)(!)				/* Put cut to stop backtraking when the theorem is solved.*/
+	(solve KB4 STEPS 1))		/* Because solve is getting out from the loop by failing*/
+	
+
+/*
+	Transform the knowledgebase from the state S1 in state S2 by applying a Unit resolution step
+*/
+((path S1 S2)
+	(member C1 S1) 
+	(member C2 S1)
+	(negg eq C1 C2) 
+	(move C1 C2 S1 S2))
+
+((move C1 C2 S1 (C|INT2)) 
+	(member1 (not  A) C1 R1)
+	(member1 A C2 R2)
+        (delete C1 S1 INT1) 
+        (delete C2 INT1 INT2) 
+        (append R1 R2 C))
+	
+/*
+Solve the theorem by calling recursively the path predicate in order to reach a contradiction
+*/
+((solve S1 STEPS CNT) 
+	(sort S1 SS)	/* Sort the KB, the shortest premises will be the first in list*/
+	(pp "Sorted is" SS)
+	(path SS S2) /* Apply Unit Resolution from S1 and get S2*/
+	(pp "S2 is" S2)
+	(append S2 STEPS STEPS1)(!)	/* Append current step to STEPS list*/
+	(negg member () S2)		/* Check if we riched the contradiction, by having an empty list as an element*/
+	(pp "Going to step --- " )
+	(sum 1 CNT CNT_NEXT)		/* Increment the counter*/
+	(less CNT_NEXT 10)		/* Check if we did not pases 10 steps (the maximum number of steps allowed) */
+	(solve S2 STEPS1 CNT_NEXT))	/* Continue from state S2*/
+
+((solve S1 STEPS C)
+	(pp "Program halted after " C " steps")
+	(pp "Steps are " )
+	(pp STEPS)
+	(abort))
+
+

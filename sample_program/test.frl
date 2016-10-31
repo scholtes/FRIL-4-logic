@@ -1,0 +1,130 @@
+/*
+Convert predicate.
+
+Converts the knodlege base from the format containing the operators "and" and "or"
+in a list format. 
+
+The "and" between premises are removed. 
+
+The expresion of each premise is distributed
+*/
+((conv (H and | T) L)
+	(dist_expr H HH)		/* distribute each premise*/
+	(delete and HH HHH)	/* eliminate the and's*/
+	(remove_or HHH P)		/* remove or's*/
+	(conv T TT)			/* call again for the rest */
+	(append (P) TT L)) 
+
+((conv (H) (P))
+	(dist_expr H HH)
+	(delete and HH HHH)
+	(remove_or HHH P))
+
+
+/*
+Remove the implication from the knowdlegebase
+Extract each premise and call te ri predicate to eliminate te implication
+*/
+((remove_imp (H and | T) L)
+	(ri H HH)
+	(remove_imp T TT)
+	(append (HH) (and) X)
+	(append X TT L))
+((remove_imp (H) (HH))
+	(ri H HH))
+
+((remove_or () ()))
+((remove_or (H | T) L)
+	(or-list H H)
+	(delete or H HH)
+	(remove_or T TT)
+	(append (HH) TT L)) 	
+((remove_or H HH)
+	(delete or H HH))
+
+/*
+Distribute the expresion
+
+*/
+((dist_expr L FF)
+	(dist L LL) 	/* distribute the expresion*/
+	(flatten LL FF))  /* faltten the result*/
+
+/*
+	flatten the expression removing unnecessary parenthesis
+
+*/
+((flatten ( H and | T) F) 
+	(fo H HH)
+	(flatten T TT)
+	(append (HH) (and) HH1)
+	(append HH1 (TT) F))
+
+((flatten H HH)
+	(fo H HH))
+
+((fo ( H or | T ) X)
+	(fo H HH)
+	(append HH (or) XX)
+	(fo T TT)
+	(append XX TT X))
+
+((fo (H) T)
+	(fo H T))
+
+((fo H (H)))
+
+
+((dist-or X (H and |T) ((X or H) and | TT))
+	(dist-or X T TT))
+
+((dist-or X (H) ((X or H))))
+
+
+/*
+distribute an expresion
+*/
+((dist H H )
+	(or-list H))
+((dist (H or | T) R)
+	(append L1 ( or | L2) T)
+	(and-list L1)
+	(dist-or H L1 L3)
+	(append L3 (or | L2) L4)
+	(dist L4 R))
+
+((dist (H or | T) R)
+	(and-list T)
+	(dist-or H T R))
+
+((dist (H or | T) R)
+	(dist T R))	
+
+((dist (H or | (T)) R)
+	(and-list T)
+	(dist (H or | T) R))
+
+((dist L TT)
+	(append L1 (or | L2) L)
+	(and-list L1)
+	(and-list L2)
+	(dist-or L1 L2 T)
+	(special T TT))	
+
+((dist L T)
+	(append L1 (or | L2) L)
+	(reverse L R)
+	(dist R T))
+
+((dist H H)
+	(and-list H))
+
+((dist ((not X)) ((not X))))
+((dist X X))
+
+((special (H and | (T)) X)
+	(dist H HH)
+	(dist T TT)
+	(append HH (and) T1)
+	(append T1 TT X))
+
