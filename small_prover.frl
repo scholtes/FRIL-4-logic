@@ -1,35 +1,37 @@
 
-((roi UnitResolution  cnf ((A or B) (~ B))  A))
-((roi UnitResolution  cnf ((A or B) (~ A))  B))
+((roi UnitResolution  cnf ((A or B) (not B))  A))
+((roi UnitResolution  cnf ((A or B) (not A))  B))
 
 % or, in implicative form:
 
-((roi UnitResolution  inf  ( ( (~ A) imp B) (~ B))  A))
+((roi UnitResolution  inf  ( ( (not A) imp B) (not B))  A))
 
-((roi AndElimination _ ((A ^ | T)) A))
-((roi AndElimination _ ((A ^ | T )) B)(member B T))
+((roi AndElimination _ ((A and | T)) A))
+((roi AndElimination _ ((A and | T )) B)(member B T))
 
 ((roi AndIntroduction _ () ()))
-((roi AndIntroduction _  (A | T) ( A ^ | T1) )
+((roi AndIntroduction _  (A | T) ( A and | T1) )
 	(negg member_op OP T)
 	(roi AndIntroduction _ T T1))
 
-((operators (and or imp ~)))
+((operators (and or imp not)))
 ((member_op L)(operators OPS )(member OP OPS))
 
 % De Morgan's Rules (some of the clauses):
 ((deMorgan () ()))
 
-((deMorgan ((~ (A and B and | T) )) ((~ A) or (~ B) or T1))
-	(deMorgan (~ T) T1)(!))
+((deMorgan ((not (A and B and | T) )) ((not A) or (not B) or T1))
+	(deMorgan (not T) T1)(!))
 
-((deMorgan ((~ (A or B or | T) )) ((~ A) and (~ B) and T1))
-	(deMorgan (~ T) T1)(!))
-((deMorgan ((~ (A and B or | T) )) ((~ A) or (~ B) and T1))
-	(deMorgan (~ T) T1)(!))
-((deMorgan ((~ (A or B and | T) )) ((~ A) and (~ B) or T1))
-	(deMorgan (~ T) T1)(!))
-((deMorgan (~ (A)) (~ A)))
+((deMorgan ((not (A or B or | T) )) ((not A) and (not B) and T1))
+	(deMorgan (not T) T1)(!))
+((deMorgan ((not (A and B or | T) )) ((not A) or (not B) and T1))
+	(deMorgan (not T) T1)(!))
+((deMorgan ((not (A or B and | T) )) ((not A) and (not B) or T1))
+	(deMorgan (not T) T1)(!))
+((deMorgan (not (A)) (not A)))
 %You need to define a predicate small_prover
 
 % ((small_prover  TYPE PREMISES CONCLUSION STEPS)) ....
+((small_prover TYPE PREMISES CONCLUSION (S1 S2))
+	(sp_step1 TYPE PREMISES CONCLUSION S1)......

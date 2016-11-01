@@ -1,0 +1,95 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Operations %%
+((operators and or not imp))
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Rules of Inferences
+%% -only applies once to a given formula (Even if it could be applied twice or more)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% (not not A) = (A)
+% (not not (not not A)) = ((not not A))
+((doubleNegation () ()))
+((doubleNegation ((not not A)) ((A))))
+((doubleNegation (not not A|T)(A|T)))
+((doubleNegation (H1|T1)(H1|T2))
+	(doubleNegation T1 T2))
+
+% (not (A and B)) = ((not A) or (not B))
+% (not (A or B)) = ((not A) and (not B))
+((deMorgan () ()))
+((deMorgan (not (A and B)) ((not A) or (not B)))(pp "1"))
+((deMorgan (not (A or B)) ((not A) and (not B)))(pp "2"))
+((deMorgan (not (A and | T)) ((not A) or | X))
+	(deMorgan (not T) X))
+((deMorgan (not (A or | T)) ((not A) and | X))
+	(deMorgan (not T) X))
+((deMorgan (not (A)) (not A)))
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End Rules of Inference
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Helper Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%((clean ((A)) L)(clean (A) L))
+%((clean (A) A))
+%((clean (H1|(T1)) (H2|(T2)))
+%	(clean H1 H2)
+%	(clean (T1) (T2)))
+%((clean (H1|T1) (H2|T2))%
+%	(clean H1 H2)
+%	(clean T1 T2))
+%((clean X X))
+
+((islist ()))
+((islist (_)))
+((islist (_|_)))
+
+((test (H|T) H)(pp H)(pp T))
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% List Processing 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Holds if arg1 is a member of arg2
+((member H (H|_)))
+((member E ( _|T))
+	(member E T))
+
+% Counts the length of arg1 and outputs into arg2
+((length () 0 ))
+((length (_|T) N)
+	(length T N1)
+	(sum N1 1 N))
+
+% Appends arg1 to arg2 resulting in arg3 (adds to the left)
+((append () L L))
+((append (H1|T1) L2 (H1|T))
+    (append T1 L2 T))
+
+% replaces arg1 in arg2 with arg3 to output arg4
+((substitute _ () _ () )) 
+((substitute H (H|T) H2 (H2 | T2)) 
+	(substitute H T H2 T2) 
+    (!)) 
+((substitute H (H1|T1) H2 (H1|T2))
+    (substitute H T1 H2 T2)) 
+
+% Removes arg1 from arg2 and outputs to arg3
+((remove _ () ()))
+((remove H (H|T) T))
+
+((remove I (H1|T1) (H1|T2))
+	(remove I T1 T2))
+
+((length () 0 ))
+((length (_|T) N)
+	(length T N1)
+	(sum N1 1 N))
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End List Processing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

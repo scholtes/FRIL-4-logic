@@ -4,6 +4,26 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Control Flow %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Example should be like ((smallProver cnf ((P) (P imp Q)) (Q) (ModusPonens)))
+%((smallProver cnf PREMISES CONCLUSION STEPS))
+((smallProver cnf (PREM) (CONCL) (H3|T3))
+	(roi H3 (PREM) (OUTPUT1))
+	((smallProver cnf (OUTPUT1) (CONCL) (T3))))
+
+((smallProver cnf (PREMISES) (H2|T2) ())
+	(member H2 PREMISES)
+	(smallProver cnf (PREMISES) (T2) ()))
+
+((smallProver cnf _ () ()))
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End Control Flow %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Rules of Inferences
 %% -only applies once to a given formula (Even if it could be applied twice or more)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,11 +38,49 @@
 
 % (not (A and B)) = ((not A) or (not B))
 % (not (A or B)) = ((not A) and (not B))
-((deMorgan () ()))
-((deMorgan (not (A and B)) ((not A) or (not B)))(pp "1"))
+%((deMorgan () ()))
+%((deMorgan (not (A and B)) ((not A) or (not B)))(pp "1"))
 %((deMorgan (not (A or B)) ((not A) and (not B)))(pp "2"))
-((deMorgan (H1|T1)(H1|T2))
-	(deMorgan T1 T2)(pp "3"))
+%((deMorgan (H1|T1)(H1|T2))
+%	(deMorgan T1 T2)(pp "3"))
+
+
+((roi AndIntroduction ()()))
+((roi AndIntroduction A B (A and B)))
+((roi AndIntroduction (A|B) ((A and |B1)))
+	(roi AndIntroduction B B1))
+	
+((roi AndElimination ()()))
+((roi AndElimination (A and B) ((A)(B))))
+((roi AndElimination (A and B) ((B)(A))))
+
+((roi ModusPonens ((A imp B)(A)) (B)))
+((roi ModusPonens ((A)(A imp B)) (B)))
+
+((roi OrIntroduction A (A or B)))
+((roi OrIntroduction A (B or A)))
+
+((roi UnitResoluction ((A or B)(not A)) (B)))
+((roi UnitResoluction ((A or B)(not B)) (A)))
+((roi UnitResoluction ((not A)(A or B)) (B)))
+((roi UnitResoluction ((not B)(A or B)) (A)))
+
+((roi Resolution ((A or B)((not A) or C))(B or C)))
+((roi Resolution ((A or B)((not B) or C))(A or C)))
+((roi Resolution ((A or B)((not A) or C))(C or B)))
+((roi Resolution ((A or B)((not B) or C))(C or A)))
+((roi Resolution ((A or B)(C or (not A)))(B or C)))
+((roi Resolution ((A or B)(C or (not B)))(A or C)))
+((roi Resolution ((A or B)(C or (not A)))(C or B)))
+((roi Resolution ((A or B)(C or (not B)))(C or A)))
+((roi Resolution (((not A) or C)(A or B))(B or C)))
+((roi Resolution (((not B) or C)(A or B))(A or C)))
+((roi Resolution (((not A) or C)(A or B))(C or B)))
+((roi Resolution (((not B) or C)(A or B))(C or A)))
+((roi Resolution ((C or (not A))(A or B))(B or C)))
+((roi Resolution ((C or (not B))(A or B))(A or C)))
+((roi Resolution ((C or (not A))(A or B))(C or B)))
+((roi Resolution ((C or (not B))(A or B))(C or A)))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End Rules of Inference
@@ -32,6 +90,7 @@
 %% Helper Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Should Remove Extra Parenthesis
 ((clean ((((A)))) A))
 ((clean (((A))) A))
 ((clean ((A)) A))
@@ -40,7 +99,11 @@
 ((clean ((H1|T1)) (H2|T2))
 	(clean H1 H2))
 
-((test (H|T) H)(pp H)(pp T))
+%((test (H|T) H)(pp H)(pp T))
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End Helper Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% List Processing 
