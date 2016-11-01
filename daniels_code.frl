@@ -103,6 +103,14 @@
 
 %((test (H|T) H)(pp H)(pp T))
 
+% First argument is an unordered pair of the second argument
+% (i.e., A always before B in second argument)
+((pair (A B) (A|T))
+	(member B T))
+
+((pair (A B) (_|T))
+	(pair (A B) T))
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End Helper Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
