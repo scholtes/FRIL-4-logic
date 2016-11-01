@@ -9,15 +9,17 @@
 
 % Example should be like ((smallProver cnf ((P) (P imp Q)) (Q) (ModusPonens)))
 %((smallProver cnf PREMISES CONCLUSION STEPS))
-((smallProver cnf (PREM) (CONCL) (H3|T3))
-	(roi H3 (PREM) (OUTPUT1))
-	((smallProver cnf (OUTPUT1) (CONCL) (T3))))
+((smallProver cnf PREM CONCL (H3|T3))
+	(pp "Yo")
+	(roi H3 PREM OUTPUT1)
+	(smallProver cnf OUTPUT1 CONCL T3))
 
-((smallProver cnf (PREMISES) (H2|T2) ())
+((smallProver cnf PREMISES (H2|T2) ())
+	(pp "Lo")
 	(member H2 PREMISES)
-	(smallProver cnf (PREMISES) (T2) ()))
+	(smallProver cnf PREMISES T2 ()))
 
-((smallProver cnf _ () ()))
+((smallProver cnf _ () ())(pp "Premises Proven to be Conclusion"))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End Control Flow %%
@@ -54,7 +56,7 @@
 ((roi AndElimination (A and B) ((A)(B))))
 ((roi AndElimination (A and B) ((B)(A))))
 
-((roi ModusPonens ((A imp B)(A)) (B)))
+((roi ModusPonens ((A imp B)(A)) (B))(pp "MODUS"))
 ((roi ModusPonens ((A)(A imp B)) (B)))
 
 ((roi OrIntroduction A (A or B)))
