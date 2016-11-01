@@ -111,6 +111,13 @@
 ((pair (A B) (_|T))
 	(pair (A B) T))
 
+% Last argument is a list which is the second argument L with A added to it
+% (if A is not already in L -- otherwise the last argument is exactly L)
+((uniqconcat A L (A|L))
+	(negg member A L))
+
+((uniqconcat A L L))
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End Helper Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
