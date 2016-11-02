@@ -26,3 +26,5 @@ reload daniels
 ?((smallProver cnf ((p or q) (not p) (q imp r)) r L)(pp L))
 
 ?((pp))
+
+?((smallProver cnf (((p or q) imp ((not p) or r)) (p or q)) (q or r) L)(pp L))

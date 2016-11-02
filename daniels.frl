@@ -7,51 +7,36 @@
 %% Control Flow %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Example should be like ((smallProver cnf ((P) (P imp Q)) (Q) (ModusPonens)))
-%((smallProver cnf PREMISES CONCLUSION STEPS))
+% For (smallProver T PREMISES CONCLUSION STEPS), the variables are:
+%    - T: just cnf for now
+%    - PREMISES: a list of premises  
+%    - CONCLUSION: a single proposition as the conclusion
+%    - STEPS: An ordered list of Rules of Inference (roi) to prove conclusion
+% 
+% Typically T, PREMISES, and CONCLUSION will be treated
+% as input and STEPS will be taken to be output.  
+% 
+% NOTE: Does at most 2 steps (as specified in homework description)
+% 
+% NOTE: Sensitive to extraneous parentheses
+% 
 
-%((smallProver cnf PREMISES (H2|T2) ())
-%	(pp "Lo")
-%	(member H2 PREMISES)
-%	(smallProver cnf PREMISES T2 ()))
-
-% Zero steps needed (tautology)
+% Tautologies
 ((smallProver _ PREM CONCL ())
-	(eq PREM CPREM)
-	(eq CONCL CCONCL)
-	%(pp CPREM)
-	(member CCONCL CPREM))
+	(member CONCL PREM))
 
 % Single step proof
 ((smallProver cnf PREM CONCL (S1))
-	%(pp "  One step?")
-	(eq PREM CPREM)
-	(eq CONCL CCONCL)
-	%(pp "  So far so good ")
-	(pairos PAIR CPREM)
-	%(p "  " PAIR " - And still good (" S1 ")")
-	%(pp)
+	(pairos PAIR PREM)
 	(roi S1 PAIR L)
-	%(p "  " S1)
-	%(pp)
-	(eq L CL)
-	%(p "  -" L)(pp)
-	%(p "  -" CCONCL)(pp)
-	(member CCONCL CL))
+	(member CONCL L))
 
 % Two step proof
 ((smallProver cnf PREM CONCL (S1 S2))
-	%(pp "Two steps?")
-	(eq PREM CPREM)
-	(eq CONCL CCONCL)
-	(pairos PAIR CPREM)
+	(pairos PAIR PREM)
 	(roi S1 PAIR OUTCOME)
-	(eq OUTCOME COUTCOME)
-	(uniqapp COUTCOME CPREM NEWPREM)
-	%(p "---- " COUTCOME " ----")(pp)
-	%(p "---- " CPREM " ----")(pp)
-	%(p "---- " NEWPREM " ----")(pp)(pp)
-	(smallProver cnf NEWPREM CCONCL (S2)))
+	(uniqapp OUTCOME PREM NEWPREM)
+	(smallProver cnf NEWPREM CONCL (S2)))
 
 %((smallProver cnf PREM CONCL (H3|T3))
 %	(roi H3 PREM OUTPUT1)
@@ -105,22 +90,22 @@
 ((roi UnitResolution ((not A) (A or B)) (B)))
 ((roi UnitResolution ((not B) (A or B)) (A)))
 
-((roi Resolution ((A or B)((not A) or C))(B or C)))
-((roi Resolution ((A or B)((not B) or C))(A or C)))
-((roi Resolution ((A or B)((not A) or C))(C or B)))
-((roi Resolution ((A or B)((not B) or C))(C or A)))
-((roi Resolution ((A or B)(C or (not A)))(B or C)))
-((roi Resolution ((A or B)(C or (not B)))(A or C)))
-((roi Resolution ((A or B)(C or (not A)))(C or B)))
-((roi Resolution ((A or B)(C or (not B)))(C or A)))
-((roi Resolution (((not A) or C)(A or B))(B or C)))
-((roi Resolution (((not B) or C)(A or B))(A or C)))
-((roi Resolution (((not A) or C)(A or B))(C or B)))
-((roi Resolution (((not B) or C)(A or B))(C or A)))
-((roi Resolution ((C or (not A))(A or B))(B or C)))
-((roi Resolution ((C or (not B))(A or B))(A or C)))
-((roi Resolution ((C or (not A))(A or B))(C or B)))
-((roi Resolution ((C or (not B))(A or B))(C or A)))
+((roi Resolution ((A or B)((not A) or C))((B or C))))
+((roi Resolution ((A or B)((not B) or C))((A or C))))
+((roi Resolution ((A or B)((not A) or C))((C or B))))
+((roi Resolution ((A or B)((not B) or C))((C or A))))
+((roi Resolution ((A or B)(C or (not A)))((B or C))))
+((roi Resolution ((A or B)(C or (not B)))((A or C))))
+((roi Resolution ((A or B)(C or (not A)))((C or B))))
+((roi Resolution ((A or B)(C or (not B)))((C or A))))
+((roi Resolution (((not A) or C)(A or B))((B or C))))
+((roi Resolution (((not B) or C)(A or B))((A or C))))
+((roi Resolution (((not A) or C)(A or B))((C or B))))
+((roi Resolution (((not B) or C)(A or B))((C or A))))
+((roi Resolution ((C or (not A))(A or B))((B or C))))
+((roi Resolution ((C or (not B))(A or B))((A or C))))
+((roi Resolution ((C or (not A))(A or B))((C or B))))
+((roi Resolution ((C or (not B))(A or B))((C or A))))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End Rules of Inference
