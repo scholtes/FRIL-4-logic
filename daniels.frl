@@ -1,6 +1,32 @@
+/* Alex Kersey
+ * Daniel Moon 
+ * Garrett Scholtes
+ * 
+ * Due 2016-11-01
+ * 
+ * AI Assignment #4
+ *
+ * "Predicate Logic Theorem Prover"
+ * 
+ * =================================================================
+ * === Scroll down to the bottom for a sample run of the program ===
+ * =================================================================
+ * 
+ * You may run the sample code by running:
+ * 
+ *     reload KerseyMoonScholtes
+ * 
+ * in your FRIL console in the correct directory
+ *
+ */
+
+
+% ------------------------------------------------------------ %
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Operations %%
-((operators and or not imp))
+% ((operators and or not imp))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,13 +39,36 @@
 %    - CONCLUSION: a single proposition as the conclusion
 %    - STEPS: An ordered list of Rules of Inference (roi) to prove conclusion
 % 
+% Usage:
+% 
+% *** FOR -BACKWARD- CHAINING ***
 % Typically T, PREMISES, and CONCLUSION will be treated
 % as input and STEPS will be taken to be output.  
+% 
+% *** FOR -FORWARD- CHAINING ***
+% Typically T and PREMISES will be treated as input and 
+% CONCLUSION and STEPS will be taken to be output.
+% Note: in this case, CONCLUSION is not a single proposition -- it is
+% a LIST of all possible statements that can be reached in two steps
+% of inference or less
 % 
 % NOTE: Does at most 2 steps (as specified in homework description)
 % 
 % NOTE: Sensitive to extraneous parentheses
 % 
+
+
+%%%%% FORWARD CHAINING %%%%%
+((smallProver cnf PREM CONCL (S1 S2))
+	(pairos PAIR PREM)
+	(roi S1 PAIR CONCL1)
+	(uniqapp CONCL1 PREM PREMANDCON)
+	(pairos PAIR2 PREMANDCON)
+	(roi S2 PAIR2 CONCL2)
+	(uniqapp CONCL2 PREMANDCON CONCL))
+
+
+%%%%% BACKWARD CHAINING %%%%%
 
 % Tautologies
 ((smallProver _ PREM CONCL ())
@@ -38,11 +87,6 @@
 	(uniqapp OUTCOME PREM NEWPREM)
 	(smallProver cnf NEWPREM CONCL (S2)))
 
-%((smallProver cnf PREM CONCL (H3|T3))
-%	(roi H3 PREM OUTPUT1)
-%	(smallProver cnf OUTPUT1 CONCL T3))
-
-%((smallProver cnf _ () ())(pp "Premises Proven to be Conclusion"))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End Control Flow %%
@@ -53,37 +97,30 @@
 %% -only applies once to a given formula (Even if it could be applied twice or more)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% (not not A) = (A)
-% (not not (not not A)) = ((not not A))
-%((doubleNegation () ()))
 ((roi doubleNegation ((not not A)) (A)))
 ((roi doubleNegation ((not not A)) (A)))
 ((roi doubleNegation ((not (not A))) (A)))
 ((roi doubleNegation ((not (not A))) (A)))
-%((roi doubleNegation (not not A|T)(A|T)))
-%((doubleNegation (H1|T1)(H1|T2))
-	%(doubleNegation T1 T2))
 
-% (not (A and B)) = ((not A) or (not B))
-% (not (A or B)) = ((not A) and (not B))
-%((deMorgan () ()))
+%% Notice how many of these definitions appear to be redundant.  
+%% We chose to hard code the order for Rules of Inference in all orders
+%% to make the (smallProver) predicate not worry about un-orderdness
 ((roi deMorgan ((not (A and B))) (((not A) or (not B)))))
+((roi deMorgan ((not (A and B))) (((not B) or (not A)))))
 ((roi deMorgan ((not (A or B))) (((not A) and (not B)))))
-%((deMorgan (H1|T1)(H1|T2))
-%	(deMorgan T1 T2)(pp "3"))
+((roi deMorgan ((not (A or B))) (((not B) and (not A)))))
 
 ((roi AndIntroduction (A B) ((A and B))))
 ((roi AndIntroduction (A B) ((B and A))))
 	
-%((roi AndElimination ()()))
 ((roi AndElimination ((A and B)) (A B)))
 ((roi AndElimination ((A and B)) (B A)))
 
 ((roi ModusPonens ((A imp B) A) (B)))
 ((roi ModusPonens (A (A imp B)) (B)))
 
-%((roi OrIntroduction (A) ((A or B))))
-%((roi OrIntroduction (A) ((B or A))))
+((roi OrIntroduction (A) ((A or B))))
+((roi OrIntroduction (A) ((B or A))))
 
 ((roi UnitResolution ((A or B) (not A)) (B)))
 ((roi UnitResolution ((A or B) (not B)) (A)))
@@ -115,40 +152,29 @@
 %% Helper Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Should Remove Extra Parenthesis
-% Single element lists unnecessary
-((cleanop (A) B)(cleanop A B)(!))
-((cleanop (H1|(T1|(TX|TT))) (H2|T2))
-	(cleanop H1 H2)
-	(cleanop (T1|(TX|TT)) T2)(!))
-((cleanop (H1|T1) (H2|(T2)))
-	(cleanop H1 H2)
-	(cleanop T1 T2)(!))
-((cleanop (A) A)(!))
-((cleanop A A)(!))
-
-% Cleans, but makes sure a single list remains on the outside 
-((clean A (L))
-	(cleanop A L)
-	(negg islist L)(!))
-((clean A L)(cleanop A L)(!))
-
-((islist (L)))
-((islist (H|T)))
-
-%((test (H|T) H)(pp H)(pp T))
-
 % First argument is an unordered pair of the second argument
 % (i.e., A always before B in second argument)
+% E.g., 
+% 
+%    ?((pair P (1 2 3 ... N))(pp L)(fail))
+% 
+% Would be satisfied by (N choose 2) total pairs
 ((pair (A B) (A|T))
 	(member B T))
 
 ((pair (A B) (_|T))
 	(pair (A B) T))
 
-% Produces pairs or singletons 
-((pairos P L)(pair P L))
-((pairos (S) L)(member S L))
+% Produces pairs AND singletons 
+% E.g., 
+% 
+%    ?((pairos P (1 2 3 ... N))(pp L)(fail))
+% 
+% Would be satisfied by (N choose 2)+N total pairs and singletons
+((pairos P L)
+	(pair P L))
+((pairos (S) L)
+	(member S L))
 
 % Last argument is a list which is the second argument L with A added to it
 % (if A is not already in L -- otherwise the last argument is exactly L)
@@ -164,12 +190,6 @@
 	(uniqapp T L2 L1)(!))
 ((uniqapp () L L)(!))
 
-% Holds if first argument is subset of second argument
-((subset (H|T) L)
-	(member H L)
-	(negg member H T)
-	(subset T L))
-((subset () L))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End Helper Functions
@@ -184,32 +204,110 @@
 ((member E ( _|T))
 	(member E T))
 
-% Counts the length of arg1 and outputs into arg2
-((length () 0 ))
-((length (_|T) N)
-	(length T N1)
-	(sum N1 1 N))
-
-% Appends arg1 to arg2 resulting in arg3 (adds to the left)
-((append () L L))
-((append (H1|T1) L2 (H1|T))
-    (append T1 L2 T))
-
-% replaces arg1 in arg2 with arg3 to output arg4
-((substitute _ () _ () )) 
-((substitute H (H|T) H2 (H2 | T2)) 
-	(substitute H T H2 T2) 
-    (!)) 
-((substitute H (H1|T1) H2 (H1|T2))
-    (substitute H T1 H2 T2)) 
-
-% Removes arg1 from arg2 and outputs to arg3
-((remove _ () ()))
-((remove H (H|T) T))
-
-((remove I (H1|T1) (H1|T2))
-	(remove I T1 T2))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% End List Processing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Backward Chaining Example %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+?((pp "%%%%%%%%%%%% Backward Chaining Example %%%%%%%%%%%%")
+	(pp)
+	(pp "The following 12 examples are a demonstration of the theorem prover")
+	(pp "successfully proving propositional logic statements that require")
+	(pp "two or fewer steps. ")
+	(pp)
+	(pp "The lists that you see below each of the 12 example assertions")
+	(pp "are the Rules of Inference applied to prove the statement.")
+	(pp "These lists are ordered and can be seen as steps in the proof.")
+	(pp "")
+	(pp "Example usage:")
+	(pp "")
+	(pp "Suppose you wish to prove:  ")
+	(pp)
+	(pp "    p or q, not p, q imp r  |=  r")
+	(pp )
+	(pp "This could be achieved by the command: ")
+	(pp )
+	(pp "    ?((smallProver cnf ((p or q) (not p) (q imp r)) r L)(pp L))")
+	(pp )
+	(pp "Which would output (UnitResolution ModusPonens)")
+	(pp )
+	(pp "*** Take careful note of parentheses usage ***")
+	(pp "Generally speaking, less parentheses are better,")
+	(pp "except where a statement would require order of operations.")
+	(pp )
+	(pp ))
+
+?((pp "1.   ((p imp q) p)  |=  q  "))
+?((smallProver cnf ((p imp q) p) q L)(pp L)(pp))
+?((pp "2.   ((p imp q)(q imp r) p)  |=  r"))
+?((smallProver cnf ((p imp q)(q imp r) p) r L)(pp L)(pp))
+
+?((pp))
+
+?((pp "3.   (p imp q) and p  |=  q"))
+?((smallProver cnf (((p imp q) and p)) q L)(pp L)(pp))
+?((pp "4.   a, b  |=  a and b"))
+?((smallProver cnf (a b) (a and b) L)(pp L)(pp))
+?((pp "5.   p, q, (p and q) imp r  |=  r"))
+?((smallProver cnf (p q ((p and q) imp r)) r L)(pp L)(pp))
+
+?((pp "6.   not (p and q)  |=  (not p) or (not q)"))
+?((smallProver cnf ((not (p and q))) ((not p) or (not q)) L)(pp L)(pp))
+?((pp "7.   not (p and q), (not p) or (not q) imp r  |=  r"))
+?((smallProver cnf ((not (p and q)) (((not p) or (not q)) imp r)) r L)(pp L)(pp))
+
+?((pp "8.   not (not q)  |=  q"))
+?((smallProver cnf ((not (not q))) q L)(pp L)(pp))
+?((pp "9.   not not q  |=  q"))
+?((smallProver cnf ((not not q)) q L)(pp L)(pp))
+
+?((pp "10.   p or q, not p  |=  q"))
+?((smallProver cnf ((p or q) (not p)) q L)(pp L)(pp))
+?((pp "11.   p or q, not p, q imp r  |=  r"))
+?((smallProver cnf ((p or q) (not p) (q imp r)) r L)(pp L)(pp))
+
+?((pp "12.   (p or q) imp ((not p) or r), p or q  |=  (q or r)"))
+?((smallProver cnf (((p or q) imp ((not p) or r)) (p or q)) (q or r) L)(pp L)(pp))
+
+?((pp)(pp))
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Forward Chaining Example %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+?((pp "%%%%%%%%%%%% Forward Chaining Example %%%%%%%%%%%%")
+(pp)
+(pp "What can you conclude from the Premises: P, P imp Q, Q imp R?")
+(pp "If we use Modus Ponens twice we can obtain:")
+(pp)
+(smallProver cnf (p (p imp q)(q imp r)) L1 (ModusPonens ModusPonens))
+(pp L1)
+(pp)
+(pp "If we use Modus Ponens and then AndIntroduction we obtain")
+(smallProver cnf (p (p imp q)(q imp r)) L2 (ModusPonens AndIntroduction))
+(pp L2)
+(pp)
+(pp "You also do not have to specify any inference rules and can find all possible conclusions")
+(pp "within a two-step reach, we won't automatically run that one, but if you're curious try running")
+(pp)
+(pp "?((all))")
+(pp)
+(pp "The conclusions that command will find will use the same premises in the previous examples")
+(pp "P, P imp Q, Q imp R"))
+
+((all)
+    (smallProver cnf ((p imp q) p (q imp r)) L R)
+    (p "Rules of Inference Used: " R)
+    (pp)
+    (p "Conclusions Obtained: " L)
+    (pp)(pp)
+    (fail))
