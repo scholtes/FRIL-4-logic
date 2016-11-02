@@ -1,0 +1,28 @@
+reload daniels
+
+?((smallProver cnf ((p imp q) p) q L)(pp L))
+?((smallProver cnf ((p imp q) p) q L)(pp L))
+?((smallProver cnf ((p imp q)(q imp r) p) r L)(pp L))
+
+?((pp))
+
+?((smallProver cnf (((p imp q) and p)) q L)(pp L))
+?((smallProver cnf (a b) (a and b) L)(pp L))
+?((smallProver cnf (p q ((p and q) imp r)) r L)(pp L))
+
+?((pp))
+
+?((smallProver cnf ((not (p and q))) ((not p) or (not q)) L)(pp L))
+?((smallProver cnf ((not (p and q)) (((not p) or (not q)) imp r)) r L)(pp L))
+
+?((pp))
+
+?((smallProver cnf ((not (not q))) q L)(pp L))
+?((smallProver cnf ((not not q)) q L)(pp L))
+
+?((pp))
+
+?((smallProver cnf ((p or q) (not p)) q L)(pp L))
+?((smallProver cnf ((p or q) (not p) (q imp r)) r L)(pp L))
+
+?((pp))
