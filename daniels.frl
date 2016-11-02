@@ -311,3 +311,100 @@
     (p "Conclusions Obtained: " L)
     (pp)(pp)
     (fail))
+
+
+
+/**********************************************************************
+----------------------------------------
+			Sample run!
+----------------------------------------
+
+
+Fril> reload KerseyMoonScholtes
+%%%%%%%%%%%% Backward Chaining Example %%%%%%%%%%%%
+
+The following 12 examples are a demonstration of the theorem prover
+successfully proving propositional logic statements that require
+two or fewer steps.
+
+The lists that you see below each of the 12 example assertions
+are the Rules of Inference applied to prove the statement.
+These lists are ordered and can be seen as steps in the proof.
+
+Example usage:
+
+Suppose you wish to prove:
+
+    p or q, not p, q imp r  |=  r
+
+This could be achieved by the command:
+
+    ?((smallProver cnf ((p or q) (not p) (q imp r)) r L)(pp L))
+
+Which would output (UnitResolution ModusPonens)
+
+*** Take careful note of parentheses usage ***
+Generally speaking, less parentheses are better,
+except where a statement would require order of operations.
+
+
+1.   ((p imp q) p)  |=  q
+(ModusPonens)
+
+2.   ((p imp q)(q imp r) p)  |=  r
+(ModusPonens ModusPonens)
+
+
+3.   (p imp q) and p  |=  q
+(AndElimination ModusPonens)
+
+4.   a, b  |=  a and b
+(AndIntroduction)
+
+5.   p, q, (p and q) imp r  |=  r
+(AndIntroduction ModusPonens)
+
+6.   not (p and q)  |=  (not p) or (not q)
+(deMorgan)
+
+7.   not (p and q), (not p) or (not q) imp r  |=  r
+(deMorgan ModusPonens)
+
+8.   not (not q)  |=  q
+(doubleNegation)
+
+9.   not not q  |=  q
+(doubleNegation)
+
+10.   p or q, not p  |=  q
+(UnitResolution)
+
+11.   p or q, not p, q imp r  |=  r
+(UnitResolution ModusPonens)
+
+12.   (p or q) imp ((not p) or r), p or q  |=  (q or r)
+(ModusPonens Resolution)
+
+
+
+%%%%%%%%%%%% Forward Chaining Example %%%%%%%%%%%%
+
+What can you conclude from the Premises: P, P imp Q, Q imp R?
+If we use Modus Ponens twice we can obtain:
+
+(r q p (p imp q) (q imp r))
+
+If we use Modus Ponens and then AndIntroduction we obtain
+((q and p) q p (p imp q) (q imp r))
+
+You also do not have to specify any inference rules and can find all possible conclusions
+within a two-step reach, we won't automatically run that one, but if you're curious try running
+
+?((all))
+
+The conclusions that command will find will use the same premises in the previous examples
+P, P imp Q, Q imp R
+
+yes
+
+**********************************************************************/
